@@ -62,8 +62,6 @@ dockers:
   - image_templates:
       - "pomerium/ingress-controller:amd64-{{ .Tag }}"
     dockerfile: Dockerfile.release
-    ids:
-      - pomerium-ingress
     build_flag_templates:
       - "--pull"
       - "--build-arg=ARCH=amd64"
@@ -74,21 +72,19 @@ dockers:
       - "--label=org.opencontainers.image.source={{.GitURL}}"
       - "--label=repository=http://github.com/pomerium/ingress-pomerium"
 
-  - goarch: arm64
-    image_templates:
-      - "pomerium/ingress-controller:arm64v8-{{ .Tag }}"
-    dockerfile: Dockerfile.release
-    ids:
-      - ingress-pomerium
-    build_flag_templates:
-      - "--pull"
-      - "--build-arg=ARCH=arm64"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--label=repository=http://github.com/pomerium/ingress-pomerium"
+  # - goarch: arm64
+  #   image_templates:
+  #     - "pomerium/ingress-controller:arm64v8-{{ .Tag }}"
+  #   dockerfile: Dockerfile.release
+  #   build_flag_templates:
+  #     - "--pull"
+  #     - "--build-arg=ARCH=arm64"
+  #     - "--label=org.opencontainers.image.created={{.Date}}"
+  #     - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  #     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  #     - "--label=org.opencontainers.image.version={{.Version}}"
+  #     - "--label=org.opencontainers.image.source={{.GitURL}}"
+  #     - "--label=repository=http://github.com/pomerium/ingress-pomerium"
 
 docker_manifests:
   - name_template: "pomerium/ingress-controller:{{ .Tag }}"
