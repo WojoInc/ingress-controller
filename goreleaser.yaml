@@ -77,7 +77,7 @@ dockers:
   - goarch: arm64
     image_templates:
       - "pomerium/ingress-controller:arm64v8-{{ .Tag }}"
-    dockerfile: .github/Dockerfile.release
+    dockerfile: Dockerfile.release
     ids:
       - ingress-pomerium
     build_flag_templates:
