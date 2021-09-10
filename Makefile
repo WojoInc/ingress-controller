@@ -82,7 +82,7 @@ docker-push: ## Push docker image with the manager.
 
 .PHONE: snapshot
 snapshot: 
-	goreleaser build --snapshot --rm-dist
+	goreleaser release --snapshot --rm-dist
 
 ##@ Deployment
 
