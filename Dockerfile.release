@@ -1,0 +1,6 @@
+ARG ARCH
+
+FROM gcr.io/distroless/static:nonroot
+WORKDIR /pomerium
+COPY pomerium* /bin/
+ENTRYPOINT [ "/bin/pomerium-ingress" ]

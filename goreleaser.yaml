@@ -1,0 +1,98 @@
+project_name: pomerium/ingress-controller
+
+release:
+  prerelease: auto
+  github:
+    owner: pomerium
+    name: ingress-controller
+  name_template: "v{{.Version}}"
+
+env:
+  - GO111MODULE=on
+  - CGO_ENABLED=0
+
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - id: pomerium-ingress
+    main: main.go
+    binary: pomerium-ingress
+    goarch:
+      - amd64
+      - arm64
+    goos:
+      - linux
+      - darwin
+
+    ldflags:
+      - -s -w
+      - -X github.com/pomerium/pomerium/internal/version.Version={{.Version}}
+      - -X github.com/pomerium/pomerium/internal/version.GitCommit={{.ShortCommit}}
+      - -X github.com/pomerium/pomerium/internal/version.BuildMeta={{.Timestamp}}
+      - -X github.com/pomerium/pomerium/internal/version.ProjectName=pomerium/ingress-controller
+      - -X github.com/pomerium/pomerium/internal/version.ProjectURL=https://github.com/pomerium/ingress-controller
+
+    hooks:
+      pre:
+        - cmd: ./scripts/get-envoy.bash
+          env:
+            - TARGET={{ .Os }}-{{ .Arch }}
+
+
+archives:
+  - name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    id: pomerium-ingress
+    builds:
+      - pomerium-ingress
+    files:
+      - none*
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+
+snapshot:
+  name_template: "{{ .Version }}+next+{{ .ShortCommit }}"
+
+dockers:
+  - image_templates:
+      - "pomerium/ingress-controller:amd64-{{ .Tag }}"
+    dockerfile: Dockerfile.release
+    ids:
+      - pomerium-ingress
+    build_flag_templates:
+      - "--pull"
+      - "--build-arg=ARCH=amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--label=repository=http://github.com/pomerium/ingress-pomerium"
+
+  - goarch: arm64
+    image_templates:
+      - "pomerium/ingress-controller:arm64v8-{{ .Tag }}"
+    dockerfile: .github/Dockerfile.release
+    ids:
+      - ingress-pomerium
+    build_flag_templates:
+      - "--pull"
+      - "--build-arg=ARCH=arm64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+      - "--label=repository=http://github.com/pomerium/ingress-pomerium"
+
+docker_manifests:
+  - name_template: "pomerium/ingress-controller:{{ .Tag }}"
+    image_templates:
+      - pomerium/ingress-controller:arm64v8-{{ .Tag }}
+      - pomerium/ingress-controller:amd64-{{ .Tag }}
+
