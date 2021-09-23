@@ -21,10 +21,10 @@ builds:
     binary: pomerium-ingress
     goarch:
       - amd64
-      - arm64
+      # - arm64
     goos:
       - linux
-      - darwin
+      # - darwin
 
     ldflags:
       - -s -w
