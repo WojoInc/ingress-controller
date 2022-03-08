@@ -210,7 +210,9 @@ func getServiceURLs(namespace string, p networkingv1.HTTPIngressPath, ic *model.
 			for _, subset := range endpoints.Subsets {
 				for _, endpointAddress := range subset.Addresses {
 					for _, endpointPort := range subset.Ports {
-						hosts = append(hosts, fmt.Sprintf("%s:%d", endpointAddress.IP, endpointPort.Port))
+						if len(subset.Ports) > 1 && (endpointPort.Name == svc.Port.Name || endpointPort.Port == svc.Port.Number) {
+							hosts = append(hosts, fmt.Sprintf("%s:%d", endpointAddress.IP, endpointPort.Port))
+						}
 					}
 				}
 			}
